@@ -6,6 +6,7 @@ dotenv.config();
 // Hàm đăng nhập
 const login = async (req, res) => {
   const { username, password } = req.body;
+
   try {
     // Tìm người dùng trong cơ sở dữ liệu
     const user = await User.findOne({ username });

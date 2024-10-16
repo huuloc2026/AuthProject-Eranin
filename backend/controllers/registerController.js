@@ -1,20 +1,22 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
+const { cookieTokenResponse } = require("../controllers/authController");
 const register = async (req, res) => {
-  const { username, phone, password } = req.body;
+  const { name, email, password, confirmPassword } = req.body;
 
   try {
-    const existingUser = await User.findOne({ username });
-    if (existingUser && phone) {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
       return res.status(400).json({ message: "Username already exists" });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
-      username,
-      phone,
+      name,
+      email,
       password: hashedPassword,
+      confirmPassword: hashedPassword,
     });
     await newUser.save();
 
