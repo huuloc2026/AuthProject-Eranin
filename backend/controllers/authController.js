@@ -1,15 +1,12 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const User = require("../models/userModel");
+const User = require("../models/userModel"); // Đảm bảo đường dẫn đúng
 
-const login = async (req, res) => {
-  res.send("Hello");
+// Hàm xác minh MFA
+const verifyMFA = async (req, res) => {
+  // Logic để xác minh MFA (ví dụ: kiểm tra mã gửi đến người dùng)
+  // Placeholder cho xác minh MFA
+  res.send("MFA verification endpoint");
 };
 
-module.exports = { login };
-
-// exports.verifyMFA = async (req, res) => {
-//   // Logic to verify MFA (e.g., checking a code sent to the user)
-//   // Placeholder for MFA verification
-//   res.send("MFA verification endpoint");
-// };
+module.exports = { verifyMFA };
