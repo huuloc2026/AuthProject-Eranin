@@ -1,20 +1,27 @@
 const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv");
-dotenv.config();
-//
-const authenticate = (req, res, next) => {
-  // Lấy token từ header
-  const token = req.header("token");
-  if (!token) {
-    return res.status(401).json({ message: "No token provided." });
-  }
+const User = require("../models/userModel");
+const authMiddleware = async (req, res, next) => {
   try {
-    const decode = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decode);
-    next();
+    const token = req.header("Authorization").split(" ")[1];
+
+    if (!token) {
+      return res.status(401).json({ message: "Not authorized, no token" });
+    }
+    // Xác thực token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Thay đổi `JWT_SECRET` thành bí mật của bạn
+    req.user = await User.findById(decoded.id);
+
+    if (!req.user) {
+      return res
+        .status(401)
+        .json({ message: "Not authorized, user not found" });
+    }
+
+    next(); // Tiếp tục nếu xác thực thành công
   } catch (error) {
-    return res.status(403).json({ message: "Invalid token." });
+    console.error(error);
+    res.status(401).json({ message: "Not authorized" });
   }
 };
 
-module.exports = authenticate;
+module.exports = authMiddleware;

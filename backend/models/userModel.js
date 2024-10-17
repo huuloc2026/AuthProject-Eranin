@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema({
     },
   },
   twoFactorAuthCode: String,
-  twoFactorAuthEnabled: Boolean,
+  twoFactorAuthEnabled: { type: Boolean, default: false },
 });
 
 userSchema.pre("save", async function (next) {
@@ -44,14 +44,20 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-userSchema.methods.signJwtToken = function () {
+userSchema.methods.signShortJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
+    expiresIn: process.env.JWT_SHORT_EXPIRES_IN,
+  });
+};
+
+userSchema.methods.signLongJwtToken = function () {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_LONG_EXPIRES_IN,
   });
 };
 
 userSchema.methods.correctPassword = async function (userPassword) {
-  return await bcrypt.compare(userPassword, this.password);
+  return bcrypt.compare(userPassword, this.password);
 };
 
 module.exports = mongoose.model("User", userSchema);

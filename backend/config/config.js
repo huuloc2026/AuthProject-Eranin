@@ -3,11 +3,11 @@ const mongoose = require("mongoose");
 const dbState = [
   {
     value: 0,
-    label: "Disconnected",
+    label: "*****Disconnected",
   },
   {
     value: 1,
-    label: "Connected",
+    label: "======> Success Connected",
   },
   {
     value: 2,
@@ -24,6 +24,7 @@ const connection = async () => {
     dbName: process.env.DB_DATANAME,
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useFindAndModify: false,
   };
   try {
     await mongoose.connect(process.env.DB_HOST, options);

@@ -1,8 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const authenticate = require("../middleware/authMiddleware"); // Middleware xác thực
-
-// Route GET để lấy tất cả sản phẩm
 
 const exampleProducts = [
   {
@@ -116,10 +113,9 @@ const exampleProducts = [
     },
   },
 ];
-
-router.get("/listvoucher", authenticate, async (req, res) => {
+const authMiddleware = require("../middleware/authMiddleware");
+router.get("/listvoucher", authMiddleware, async (req, res) => {
   try {
-    // const products = await Product.find(); // Tìm tất cả sản phẩm trong cơ sở dữ liệu
     res.status(200).json(exampleProducts); // Trả về danh sách sản phẩm
   } catch (error) {
     console.error(error);
