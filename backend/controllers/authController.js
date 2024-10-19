@@ -12,7 +12,7 @@ const cookieTokenResponse = (User, statusCode, res) => {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
-    httpOnly: true,
+    httpOnly: false,
   };
   if (process.env.NODE_ENV === "production") {
     cookieOptions.secure = true;
@@ -20,18 +20,14 @@ const cookieTokenResponse = (User, statusCode, res) => {
   User.password = undefined;
   User.twoFactorAuthCode = undefined;
 
-  res
-    .status(statusCode)
-    .cookie("shortToken", shortToken, cookieOptions)
-    .cookie("longToken", longToken, cookieOptions)
-    .json({
-      message: "Success register",
-      shortToken,
-      longToken,
-      data: {
-        User,
-      },
-    });
+  res.status(statusCode).json({
+    message: "Success",
+    shortToken,
+    longToken,
+    data: {
+      User,
+    },
+  });
 };
 const generateSpeakeasySecretCode = () => {
   const secretCode = speakeasy.generateSecret({
@@ -43,28 +39,40 @@ const generateSpeakeasySecretCode = () => {
     base32: secretCode.base32,
   };
 };
-const returnQRCode = (data, res) => {
+const returnQRCode = async (data, res) => {
   // const stringData = new TextDecoder("utf-8").decode(data);
 
   QRCode.toFileStream(res, data, {
     type: "png",
   });
+
+  //URL Image
+
+  // try {
+  //   const qrCodeImage = await QRCode.toDataURL(data); // Tạo ảnh QR dưới dạng data URL
+  //   res.status(200).json({ qrCodeImage }); // Trả về ảnh QR trong phản hồi
+  // } catch (error) {
+  //   console.error(error);
+  //   res.status(500).json({ message: "Error generating QR code" });
+  // }
 };
 
 exports.generate2FACode = async (req, res, next) => {
   try {
-    const token = req.cookies.longToken;
-
+    const token = await req.headers.authorization.split(" ")[1];
+    console.log(token);
+    console.log("req.cookies", req.cookies.refreshToken);
     if (!token) {
       return res.status(400).json({ message: "Token not found" });
     }
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
     const { otpauthURL, base32 } = generateSpeakeasySecretCode();
-    console.log(decoded);
-    await User.findOneAndUpdate(decoded.id, {
-      twoFactorAuthCode: base32,
-    });
+    await User.findOneAndUpdate(
+      { _id: decoded.id },
+      { twoFactorAuthCode: base32 },
+      { new: true } // Để trả về tài liệu đã cập nhật
+    );
 
     returnQRCode(otpauthURL, res);
   } catch (error) {
@@ -74,8 +82,22 @@ exports.generate2FACode = async (req, res, next) => {
 };
 exports.verify2FACode = async (req, res, next) => {
   const { token } = req.body;
-  const cookieToken = req.cookies.longToken;
-  const decoded = jwt.verify(cookieToken, process.env.JWT_SECRET);
+
+  console.log(req.cookies);
+
+  const cookieToken = req.headers.authorization.split(" ")[1];
+
+  if (!cookieToken) {
+    return res.status(400).json({ message: "Token not found" });
+  }
+
+  let decoded;
+  try {
+    decoded = jwt.verify(cookieToken, process.env.JWT_SECRET);
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+
   const user = await User.findById(decoded.id);
 
   const verified = speakeasy.totp.verify({
@@ -85,14 +107,28 @@ exports.verify2FACode = async (req, res, next) => {
   });
 
   if (verified) {
-    await User.findOneAndUpdate(decoded.id, {
-      twoFactorAuthEnabled: true,
-    });
-    cookieTokenResponse(user, 200, res);
+    try {
+      const updatedUser = await User.findOneAndUpdate(
+        { _id: decoded.id },
+        {
+          twoFactorAuthEnabled: true,
+        },
+        { new: true }
+      );
+
+      if (!updatedUser) {
+        return res.status(500).json({ message: "Failed to update user" });
+      }
+
+      return res.status(200).json({
+        message: "success",
+      });
+    } catch (error) {
+      console.error("Error updating user:", error);
+      return res.status(500).json({ message: "Internal Server Error" });
+    }
   } else {
-    res.json({
-      verified: false,
-    });
+    res.status(400).json({ verified: false, message: "Invalid 2FA code" });
   }
 };
 
@@ -127,6 +163,8 @@ exports.registerUser = async (req, res, next) => {
     next(error);
   }
 };
+///
+
 exports.login = async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -145,8 +183,12 @@ exports.login = async (req, res, next) => {
 };
 
 exports.logoutUser = async (req, res, next) => {
+  res.cookie("shortToken", "loggedout", {
+    expires: new Date(Date.now() + 5 * 1000), // Sửa lỗi này
+    httpOnly: true,
+  });
   res.cookie("longToken", "loggedout", {
-    expires: new Date(Date.now() + 10 * 1000), // Sửa lỗi này
+    expires: new Date(Date.now() + 5 * 1000), // Sửa lỗi này
     httpOnly: true,
   });
   res.status(200).json({ message: "success" });

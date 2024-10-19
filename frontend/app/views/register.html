@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="vi" ng-app="myApp">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"
+    />
+    <title>Đăng Ký</title>
+    <style>
+      .main-login {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" ng-controller="registerController">
+      <div class="main-login">
+        <h5 class="text-center">Đăng Ký Tài Khoản</h5>
+        <form ng-submit="register()">
+          <div class="form-group">
+            <label for="username" class="control-label">Tên Người Dùng</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-users"></i></span>
+              <input
+                type="text"
+                class="form-control"
+                ng-model="name"
+                id="username"
+                placeholder="Nhập Tên Người Dùng"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="email" class="control-label">Email của Bạn</label>
+            <div class="input-group">
+              <span class="input-group-addon"
+                ><i class="fa fa-envelope"></i
+              ></span>
+              <input
+                type="email"
+                class="form-control"
+                ng-model="email"
+                id="email"
+                placeholder="Nhập Email"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="control-label">Mật Khẩu</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+              <input
+                type="password"
+                class="form-control"
+                ng-model="password"
+                id="password"
+                placeholder="Nhập Mật Khẩu"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="confirm" class="control-label">Xác Nhận Mật Khẩu</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+              <input
+                type="password"
+                class="form-control"
+                ng-model="confirmPassword"
+                id="confirm"
+                placeholder="Xác Nhận Mật Khẩu"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-lg btn-block">
+              Đăng Ký
+            </button>
+          </div>
+        </form>
+        <p class="text-center">
+          <a href="#!/login">Đã có tài khoản? Đăng Nhập</a>
+        </p>
+      </div>
+    </div>
+
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  </body>
+</html>

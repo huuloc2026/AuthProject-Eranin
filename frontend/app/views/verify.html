@@ -1,0 +1,63 @@
+<div ng-controller="verifyController">
+  <h2>Verify 2FA</h2>
+  <form ng-submit="verify()">
+    <div>
+      <label for="token">Enter Verification Token:</label>
+      <input type="text" id="token" ng-model="token" required />
+    </div>
+    <button type="submit">Verify</button>
+  </form>
+  <div ng-if="errorMessage" style="color: red">{{ errorMessage }}</div>
+</div>
+<style>
+  /* Đặt chung cho body */
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4; /* Màu nền nhẹ */
+  }
+
+  /* Bố cục cho container */
+  div[ng-controller="verifyController"] {
+    max-width: 400px; /* Chiều rộng tối đa */
+    margin: 0 auto; /* Căn giữa */
+    padding: 20px;
+    background: white; /* Nền trắng cho form */
+    border-radius: 8px; /* Bo góc */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng */
+  }
+
+  /* Style cho form */
+  form {
+    display: flex;
+    flex-direction: column; /* Bố trí theo chiều dọc */
+  }
+
+  /* Style cho các input và button */
+  input[type="text"],
+  button {
+    padding: 10px;
+    margin: 10px 0; /* Khoảng cách giữa các phần tử */
+    border: 1px solid #ccc; /* Viền nhẹ */
+    border-radius: 4px; /* Bo góc */
+  }
+
+  /* Style cho button */
+  button {
+    background-color: #28a745; /* Màu xanh cho nút */
+    color: white; /* Màu chữ trắng */
+    cursor: pointer; /* Con trỏ chuột khi hover */
+    transition: background-color 0.3s; /* Hiệu ứng chuyển màu */
+  }
+
+  /* Thay đổi màu khi hover */
+  button:hover {
+    background-color: #218838; /* Màu tối hơn khi hover */
+  }
+
+  /* Style cho thông báo lỗi */
+  div[ng-if="errorMessage"] {
+    margin-top: 10px; /* Khoảng cách trên */
+  }
+</style>

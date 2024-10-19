@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -20,29 +21,30 @@ const userSchema = new mongoose.Schema({
     minLength: 8,
     select: false,
   },
-  confirmPassword: {
-    type: String,
-    required: [true, "Please confirm your password"],
-    validate: {
-      validator: function (pass) {
-        return pass === this.password;
-      },
-      message: "Passwords are not the same",
-    },
-  },
+  // confirmPassword: {
+  //   type: String,
+  //   required: [true, "Please confirm your password"],
+  //   validate: {
+  //     validator: function (pass) {
+  //       return pass === this.password;
+  //     },
+  //     message: "Passwords are not the same",
+  //   },
+  // },
   twoFactorAuthCode: String,
   twoFactorAuthEnabled: { type: Boolean, default: false },
+  refreshToken: { type: String }, // Thêm trường lưu refresh token
 });
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+// userSchema.pre("save", async function (next) {
+//   if (!this.isModified("password")) return next();
 
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+//   const salt = await bcrypt.genSalt(10);
+//   this.password = await bcrypt.hash(this.password, salt);
 
-  this.confirmPassword = undefined;
-  next();
-});
+//   this.confirmPassword = undefined;
+//   next();
+// });
 
 userSchema.methods.signShortJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
@@ -50,8 +52,8 @@ userSchema.methods.signShortJwtToken = function () {
   });
 };
 
-userSchema.methods.signLongJwtToken = function () {
-  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+userSchema.methods.signRefreshToken = function () {
+  return jwt.sign({ id: this._id, email: this.email }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_LONG_EXPIRES_IN,
   });
 };

@@ -113,8 +113,8 @@ const exampleProducts = [
     },
   },
 ];
-const authMiddleware = require("../middleware/authMiddleware");
-router.get("/listvoucher", authMiddleware, async (req, res) => {
+const acccessMiddleware = require("../middleware/acccessMiddleware");
+router.get("/listvoucher", acccessMiddleware, async (req, res) => {
   try {
     res.status(200).json(exampleProducts); // Trả về danh sách sản phẩm
   } catch (error) {

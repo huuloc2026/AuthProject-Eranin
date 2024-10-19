@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <title>Danh sách sản phẩm</title>
+    <style>
+      .card {
+        width: 100%; /* Đảm bảo card chiếm toàn bộ chiều rộng */
+        max-width: 400px; /* Chiều rộng tối đa */
+        border-radius: 10px; /* Bo góc */
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* Bóng đổ */
+        padding: 20px; /* Thêm padding cho card */
+      }
+    </style>
+  </head>
+  <body ng-app="myApp" ng-controller="productController">
+    <div class="container">
+      <h2 class="mb-4">Danh sách sản phẩm</h2>
+
+      <!-- Hiển thị bảng sản phẩm khi đã đăng nhập -->
+      <div ng-if="isLoggedIn">
+        <button class="btn btn-danger mb-3" ng-click="logout()">
+          Đăng xuất
+        </button>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tên Sản Phẩm</th>
+              <th>Giá</th>
+              <th>Mô Tả</th>
+              <th>Voucher</th>
+              <th>Giảm Giá</th>
+              <th>Hạn Sử Dụng</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="product in products">
+              <td>{{ product.id }}</td>
+              <td>{{ product.name }}</td>
+              <td>{{ product.price | currency }}</td>
+              <td>{{ product.description }}</td>
+              <td>{{ product.voucher.code }}</td>
+              <td>{{ product.voucher.discount }}%</td>
+              <td>{{ product.voucher.validUntil }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Hiển thị thông báo khi chưa đăng nhập -->
+      <div ng-if="!isLoggedIn">
+        <h4>Đây là sản phẩm quyền riêng tư, vui lòng đăng nhập để truy cập.</h4>
+      </div>
+    </div>
+  </body>
+</html>

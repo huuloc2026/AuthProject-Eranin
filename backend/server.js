@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
+
 dotenv.config();
 
 const authRoutes = require("./routes/authRoutes.js");
@@ -16,6 +17,8 @@ app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(cookieParser());
+
+
 app.use("/auth", authRoutes);
 app.use("/products", productRoutes);
 

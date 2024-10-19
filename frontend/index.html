@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+  <head>
+    <meta charset="UTF-8" />
+    <title>My AngularJS App</title>
+    <link rel="stylesheet" href="app/css/styles.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular-route.js"></script>
+    <script src="app/app.js"></script>
+    <script src="app/services/authService.js"></script>
+    <script src="app/controllers/loginController.js"></script>
+    <script src="app/controllers/registerController.js"></script>
+    <script src="app/controllers/productController.js"></script>
+    <script src="app/controllers/verifyController.js"></script>
+  </head>
+  <body>
+    <h1>Welcome to My AngularJS App</h1>
+    <nav class="navbar">
+      <a href="#!/products">Product List</a>
+      <a href="#!/login" ng-if="!isLoggedIn">Login</a>
+      <!-- Chỉ hiển thị khi chưa đăng nhập -->
+      <a href="#!/register" ng-if="!isLoggedIn">Register</a>
+      <!-- Chỉ hiển thị khi chưa đăng nhập -->
+    </nav>
+    <ng-view></ng-view>
+  </body>
+</html>
