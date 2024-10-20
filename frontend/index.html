@@ -12,15 +12,15 @@
     <script src="app/controllers/registerController.js"></script>
     <script src="app/controllers/productController.js"></script>
     <script src="app/controllers/verifyController.js"></script>
+    <!-- <script src="app/controllers/authInterceptor.js"></script> -->
   </head>
   <body>
     <h1>Welcome to My AngularJS App</h1>
     <nav class="navbar">
       <a href="#!/products">Product List</a>
-      <a href="#!/login" ng-if="!isLoggedIn">Login</a>
-      <!-- Chỉ hiển thị khi chưa đăng nhập -->
+      <a href="#!/login">Login</a>
+
       <a href="#!/register" ng-if="!isLoggedIn">Register</a>
-      <!-- Chỉ hiển thị khi chưa đăng nhập -->
     </nav>
     <ng-view></ng-view>
   </body>

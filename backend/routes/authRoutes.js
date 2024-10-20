@@ -19,13 +19,15 @@ const express = require("express");
 // router.post("/2fa/verify", verify2FACode);
 
 ///
-const { login, registerUser } = require("../controllers/testAuthChatGPT");
+
 const router = express.Router();
 
-const testMiddleware = require("../middleware/middlewareTest");
 const {
+  login,
+  registerUser,
   generate2FACode,
   verify2FACode,
+  requestRefreshToken,
 } = require("../controllers/authController");
 //
 
@@ -33,6 +35,7 @@ router.post("/login", login);
 router.post("/register", registerUser);
 router.post("/2fa/generate", generate2FACode);
 router.post("/2fa/verify", verify2FACode);
+router.post("/2fa/refreshtoken", requestRefreshToken);
 
 ///
 

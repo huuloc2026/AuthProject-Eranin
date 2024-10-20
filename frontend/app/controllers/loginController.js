@@ -4,48 +4,54 @@ angular.module("myApp").controller("loginController", [
   "authService",
   "$http",
   function ($scope, $location, authService, $http) {
+    // Kiểm tra xem đã có accessToken trong sessionStorage chưa
+    const accessToken = sessionStorage.getItem("accessToken");
+    $scope.isLoggedIn = !accessToken ? false : true;
+
+    if (accessToken) {
+      $location.path("/products");
+    }
+
     $scope.email = "admin@example.com";
     $scope.password = "admin@example.com";
-    $scope.isLoggedIn = !!sessionStorage.getItem("accessToken");
-    if ($scope.isLoggedIn) {
-      $location.path("/products"); // Chuyển hướng về trang sản phẩm
-    }
+
     $scope.login = function () {
       authService
         .login($scope.email, $scope.password)
         .then(function (response) {
-          const { accessToken, user } = response.data;
+          console.log(response);
+          const { accessToken, refreshToken, user } = response.data;
+          console.log(refreshToken);
+          $location.path("/products");
 
-          // Lưu access token vào sessionStorage
-          sessionStorage.setItem("accessToken", accessToken);
+          // Kiểm tra xem có bật xác thực 2FA không
+          if (user.twoFactorAuthEnabled) {
+            sessionStorage.setItem("accessToken", accessToken);
+            sessionStorage.setItem("refreshToken", refreshToken);
 
-          if (!user.twoFactorAuthEnabled) {
-            $http
+            $scope.isLoggedIn = true;
+          } else {
+            return $http
               .post(
                 "http://localhost:3000/auth/2fa/generate",
                 {},
                 {
                   headers: {
-                    Authorization: `Bearer ${accessToken}`, // Sử dụng accessToken để xác thực
+                    Authorization: `Bearer ${accessToken} ${refreshToken}`,
+                    "X-Refresh-Token": refreshToken,
                   },
                 }
               )
               .then(function () {
-                // Chuyển hướng đến trang xác thực 2FA
+                sessionStorage.setItem("accessToken", accessToken);
+                sessionStorage.setItem("refreshToken", refreshToken);
                 $location.path("/verify");
-              })
-              .catch(function (error) {
-                console.error("Failed to generate 2FA code:", error);
-                alert("Không thể tạo mã 2FA: " + error.data.message);
               });
-          } else {
-            // Nếu không, chuyển hướng đến trang sản phẩm
-            $location.path("/products");
           }
         })
         .catch(function (error) {
-          console.error("Login failed:", error);
           alert("Đăng nhập thất bại! Vui lòng kiểm tra thông tin.");
+          sessionStorage.removeItem("accessToken");
         });
     };
   },

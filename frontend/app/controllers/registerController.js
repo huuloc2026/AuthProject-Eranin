@@ -4,14 +4,22 @@ angular.module("myApp").controller("registerController", [
   "authService",
 
   function ($scope, $location, authService) {
-    $scope.name = "hello1";
+    const accessToken = sessionStorage.getItem("accessToken");
+
+    // Kiểm tra trạng thái đăng nhập
+    $scope.isLoggedIn = !!accessToken;
+
+    // Nếu đã đăng nhập, chuyển hướng đến trang sản phẩm
+    if ($scope.isLoggedIn) {
+      $location.path("/products");
+    }
+
+    // Khởi tạo các biến đăng ký
+    $scope.name = "huuloc2026@gmail.com";
     $scope.email = "huuloc2026@gmail.com";
     $scope.password = "huuloc2026@gmail.com";
     $scope.confirmPassword = "huuloc2026@gmail.com";
-    $scope.isLoggedIn = !!sessionStorage.getItem("accessToken");
-    if ($scope.isLoggedIn) {
-      $location.path("/products"); // Chuyển hướng về trang sản phẩm
-    }
+
     $scope.register = function () {
       authService
         .register(
@@ -21,11 +29,13 @@ angular.module("myApp").controller("registerController", [
           $scope.confirmPassword
         )
         .then(function (response) {
-          alert("Đăng ký thành công!");
+          alert("Đăng ký thành công!", response);
           $location.path("/login");
         })
         .catch(function (error) {
-          const errormessage = error.data.message;
+          const errormessage = error.data
+            ? error.data.message
+            : "Đăng ký thất bại!";
           alert(errormessage);
         });
     };

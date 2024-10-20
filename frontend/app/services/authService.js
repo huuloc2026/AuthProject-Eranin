@@ -16,9 +16,8 @@ angular.module("myApp").service("authService", function ($http) {
   };
 
   this.getProducts = function () {
-    const token = sessionStorage.getItem("accessToken"); // Sử dụng sessionStorage
+    const token = sessionStorage.getItem("accessToken");
 
-    // Đảm bảo token tồn tại trước khi gửi yêu cầu
     if (!token) {
       console.error("No token found in sessionStorage");
       return Promise.reject("No token found");
@@ -26,9 +25,30 @@ angular.module("myApp").service("authService", function ($http) {
 
     // Đặt headers cho yêu cầu
     const headers = {
-      Authorization: `Bearer ${token}`, // Gửi token trong header
+      Authorization: `Bearer ${token}`,
     };
 
-    return $http.get("http://localhost:3000/products/listvoucher", { headers });
+    return $http.get("http://localhost:3000/products/listvoucher", {
+      headers,
+    });
+  };
+
+  this.refreshToken = function () {
+    const refreshToken = sessionStorage.getItem("refreshToken");
+
+    if (!refreshToken) {
+      console.error("No refresh token found in sessionStorage");
+      return Promise.reject("No refresh token found");
+    }
+
+    return $http.post(
+      "http://localhost:3000/auth/2fa/refreshtoken",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${refreshToken}`,
+        },
+      }
+    );
   };
 });

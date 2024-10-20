@@ -1,5 +1,7 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const router = express.Router();
+const User = require("../models/userModel");
 
 const exampleProducts = [
   {
@@ -113,10 +115,31 @@ const exampleProducts = [
     },
   },
 ];
-const acccessMiddleware = require("../middleware/acccessMiddleware");
-router.get("/listvoucher", acccessMiddleware, async (req, res) => {
+
+router.get("/listvoucher", async (req, res) => {
   try {
-    res.status(200).json(exampleProducts); // Trả về danh sách sản phẩm
+    const token = req.header("Authorization").split(" ")[1]; // Sử dụng optional chaining
+
+    if (!token) {
+      return res.status(401).json({ message: "Not authorized, no token" });
+    }
+
+    // Xác thực token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Tìm người dùng dựa trên ID trong token
+    req.user = await User.findById(decoded.id);
+
+    if (!req.user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const refreshToken = req.user.refreshToken;
+
+    res
+      // .cookie("refreshToken", refreshToken, { httpOnly: true })
+      .status(200)
+      .json(exampleProducts); // Trả về danh sách sản phẩm
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });

@@ -8,15 +8,13 @@ angular.module("myApp").controller("verifyController", [
 
     // Kiểm tra xem có accessToken trong sessionStorage không
     const accessToken = sessionStorage.getItem("accessToken");
-
     if (!accessToken) {
-      // Nếu không có token, chuyển hướng về trang đăng nhập
       $location.path("/login");
     }
 
     $scope.verify = function () {
       if (accessToken) {
-        const token = $scope.token; // Nhận mã OTP từ input
+        const token = $scope.token;
 
         $http
           .post(
@@ -24,18 +22,20 @@ angular.module("myApp").controller("verifyController", [
             { token: token },
             {
               headers: {
-                Authorization: `Bearer ${accessToken}`, // Sử dụng accessToken để xác thực
+                Authorization: `Bearer ${accessToken}`,
               },
             }
           )
           .then(function (response) {
             console.log("Verification successful:", response.data);
-            // Chuyển hướng đến trang sản phẩm
+            // Đánh dấu là đã đăng nhập thành công
+            $scope.isLoggedIn = true;
             $location.path("/products");
           })
           .catch(function (error) {
-            $scope.errorMessage = "Verification failed: " + error.data.message;
-            console.error("Verification failed:", error);
+            $scope.errorMessage = "Verification failed: " + error.data;
+            alert("Verification failed", error);
+            sessionStorage.removeItem("accessToken");
           });
       } else {
         $location.path("/login");

@@ -1,43 +1,61 @@
 angular.module("myApp").controller("productController", [
   "$scope",
-  "$location", // Thêm $location vào danh sách phụ thuộc
+  "$location",
   "authService",
   function ($scope, $location, authService) {
-    $scope.isLoggedIn = !!sessionStorage.getItem("accessToken");
-    // Sử dụng sessionStorage
-    $scope.products = []; // Khởi tạo biến products
+    const accessToken = sessionStorage.getItem("accessToken");
 
-    // Hàm để lấy danh sách sản phẩm
-    $scope.loadProducts = function () {
+    $scope.isLoggedIn = !!accessToken;
+    $scope.isTokenExpired = false;
+    $scope.products = [];
+    $scope.errorMessage = "";
+
+    const loadProducts = function () {
       if ($scope.isLoggedIn) {
         authService
           .getProducts()
           .then(function (response) {
-            $scope.products = response.data; // Gán dữ liệu vào biến products
+            if (response.data && response.data.length > 0) {
+              $scope.products = response.data;
+              $scope.errorMessage = "";
+            } else {
+              $scope.errorMessage = "Không có sản phẩm nào.";
+            }
           })
           .catch(function (error) {
-            console.error("Failed to load products:", error);
+            $scope.isTokenExpired = true; // Đánh dấu token đã hết hạn
+            console.log("Token hết hạn");
           });
       } else {
-        // Nếu không đăng nhập, chuyển hướng về trang đăng nhập
-        $scope.isLoggedIn = false;
+        sessionStorage.removeItem("accessToken");
+        $location.path("/login");
       }
     };
 
-    // Gọi hàm loadProducts khi controller được khởi tạo
-    $scope.loadProducts();
+    // Hàm để xử lý khi token hết hạn
+    $scope.handleTokenExpiration = function () {
+      authService
+        .refreshToken()
+        .then(function (response) {
+          console.log("New access token", response.data.accessToken);
+          sessionStorage.setItem("accessToken", response.data.accessToken);
+          $scope.isTokenExpired = false;
+          loadProducts(); // Tải lại danh sách sản phẩm
+        })
+        .catch(function (error) {
+          console.error("Lỗi khi làm mới token:", error);
+
+          $location.path("/login"); // Chuyển hướng về trang đăng nhập nếu có lỗi
+        });
+    };
+
+    loadProducts();
 
     $scope.logout = function () {
-      console.log("Đăng xuất");
-
-      $scope.products = []; // Dọn dẹp danh sách sản phẩm
-      sessionStorage.removeItem("accessToken"); // Xóa access token từ sessionStorage
-      // Nếu có refresh token trong cookies, có thể xóa hoặc không tùy thuộc vào logic bạn muốn
-      // document.cookie = "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"; // Xóa cookie refreshToken
-
-      $scope.isLoggedIn = false; // Cập nhật trạng thái đăng nhập
-      // Chuyển hướng về trang đăng nhập
-      $location.path("/login"); // Đảm bảo rằng bạn có định nghĩa cho route /login
+      sessionStorage.removeItem("accessToken");
+      $scope.isLoggedIn = false;
+      $scope.products = [];
+      $location.path("/login");
     };
   },
 ]);

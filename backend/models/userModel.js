@@ -21,30 +21,11 @@ const userSchema = new mongoose.Schema({
     minLength: 8,
     select: false,
   },
-  // confirmPassword: {
-  //   type: String,
-  //   required: [true, "Please confirm your password"],
-  //   validate: {
-  //     validator: function (pass) {
-  //       return pass === this.password;
-  //     },
-  //     message: "Passwords are not the same",
-  //   },
-  // },
+
   twoFactorAuthCode: String,
   twoFactorAuthEnabled: { type: Boolean, default: false },
   refreshToken: { type: String }, // Thêm trường lưu refresh token
 });
-
-// userSchema.pre("save", async function (next) {
-//   if (!this.isModified("password")) return next();
-
-//   const salt = await bcrypt.genSalt(10);
-//   this.password = await bcrypt.hash(this.password, salt);
-
-//   this.confirmPassword = undefined;
-//   next();
-// });
 
 userSchema.methods.signShortJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {

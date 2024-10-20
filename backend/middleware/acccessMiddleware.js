@@ -5,6 +5,7 @@ const acccessMiddleware = async (req, res, next) => {
   try {
     // Lấy token từ header Authorization
     const token = req.header("Authorization").split(" ")[1]; // Sử dụng optional chaining
+
     if (!token) {
       return res.status(401).json({ message: "Not authorized, no token" });
     }
@@ -14,16 +15,18 @@ const acccessMiddleware = async (req, res, next) => {
 
     // Tìm người dùng dựa trên ID trong token
     req.user = await User.findById(decoded.id);
-
-    if (!req.user) {
+    if (!req.user.twoFactorAuthEnabled) {
       return res
         .status(401)
         .json({ message: "Not authorized, user not found" });
     }
+
     next(); // Tiếp tục nếu xác thực thành công
   } catch (error) {
-    console.error(error);
-    res.status(401).json({ message: "Not authorized", error: error.message });
+    res.status(401).json({
+      message: "Not authorized ! Token Expired",
+      error: error.message,
+    });
   }
 };
 
