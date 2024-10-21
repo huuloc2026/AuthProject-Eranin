@@ -1,10 +1,10 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
-const acccessMiddleware = async (req, res, next) => {
+const findEmailMiddleware = async (req, res, next) => {
   try {
-    // Sử dụng optional chaining
     const token = req.header("Authorization").split(" ")[1];
+
     if (!token) {
       return res.status(401).json({ message: "Not authorized, no token" });
     }
@@ -13,12 +13,10 @@ const acccessMiddleware = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Tìm người dùng dựa trên ID trong token
-    req.user = await User.findById(decoded.id);
-    if (!req.user.twoFactorAuthEnabled) {
-      return res
-        .status(401)
-        .json({ message: "Not authorized, user not found" });
-    }
+    const userMiddleware = await User.findById(decoded.id);
+
+    req.user = userMiddleware.randomCodePassWord;
+    console.log(req.user);
 
     next(); // Tiếp tục nếu xác thực thành công
   } catch (error) {
@@ -29,4 +27,4 @@ const acccessMiddleware = async (req, res, next) => {
   }
 };
 
-module.exports = acccessMiddleware;
+module.exports = findEmailMiddleware;

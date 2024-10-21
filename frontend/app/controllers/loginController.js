@@ -12,16 +12,15 @@ angular.module("myApp").controller("loginController", [
       $location.path("/products");
     }
 
-    $scope.email = "admin@example.com";
-    $scope.password = "admin@example.com";
+    $scope.email = "thelegendstreet@gmail.com";
+    $scope.password = "thelegendstreet@gmail.com";
 
     $scope.login = function () {
       authService
         .login($scope.email, $scope.password)
         .then(function (response) {
-          console.log(response);
           const { accessToken, refreshToken, user } = response.data;
-          console.log(refreshToken);
+          // console.log(refreshToken);
           $location.path("/products");
 
           // Kiểm tra xem có bật xác thực 2FA không
@@ -45,7 +44,7 @@ angular.module("myApp").controller("loginController", [
               .then(function () {
                 sessionStorage.setItem("accessToken", accessToken);
                 sessionStorage.setItem("refreshToken", refreshToken);
-                $location.path("/verify");
+                $location.path("/mfa");
               });
           }
         })

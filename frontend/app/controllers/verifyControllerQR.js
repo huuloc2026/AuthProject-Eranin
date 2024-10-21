@@ -1,4 +1,4 @@
-angular.module("myApp").controller("verifyController", [
+angular.module("myApp").controller("verifyControllerQR", [
   "$scope",
   "$location",
   "$http",
@@ -33,8 +33,8 @@ angular.module("myApp").controller("verifyController", [
             $location.path("/products");
           })
           .catch(function (error) {
-            $scope.errorMessage = "Verification failed: " + error.data;
-            alert("Verification failed", error);
+            $scope.errorMessage = "Verification failed: " + error.data.message;
+            alert("Verification failed", error.data.message);
             sessionStorage.removeItem("accessToken");
           });
       } else {

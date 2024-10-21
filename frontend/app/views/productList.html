@@ -9,12 +9,41 @@
     />
     <title>Danh sách sản phẩm</title>
     <style>
+      body {
+        background-color: #f8f9fa;
+      }
+
       .card {
-        width: 100%;
-        max-width: 400px;
         border-radius: 10px;
         box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
         padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .button-container {
+        display: flex;
+        justify-content: space-between; /* Tạo không gian giữa hai nút */
+        margin: 10px 0; /* Khoảng cách trên và dưới cho button container */
+      }
+
+      @media (max-width: 768px) {
+        .table-responsive {
+          overflow-x: auto;
+        }
+
+        .card {
+          padding: 15px;
+        }
+
+        .button-container {
+          flex-direction: column; /* Xếp chồng nút khi màn hình nhỏ */
+          align-items: center; /* Căn giữa các nút */
+        }
+
+        .button-container .btn {
+          margin: 5px 0; /* Khoảng cách giữa các nút khi xếp chồng */
+          width: 100%; /* Chiếm toàn bộ chiều rộng */
+        }
       }
     </style>
   </head>
@@ -24,37 +53,42 @@
 
       <!-- Hiển thị bảng sản phẩm khi đã đăng nhập -->
       <div ng-if="isLoggedIn">
-        <button class="btn btn-danger mb-3" ng-click="logout()">
-          Đăng xuất
-        </button>
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Tên Sản Phẩm</th>
-              <th>Giá</th>
-              <th>Mô Tả</th>
-              <th>Voucher</th>
-              <th>Giảm Giá</th>
-              <th>Hạn Sử Dụng</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr ng-repeat="product in products">
-              <td>{{ product.id }}</td>
-              <td>{{ product.name }}</td>
-              <td>{{ product.price | currency }}</td>
-              <td>{{ product.description }}</td>
-              <td>{{ product.voucher.code }}</td>
-              <td>{{ product.voucher.discount }}%</td>
-              <td>{{ product.voucher.validUntil }}</td>
-            </tr>
-          </tbody>
-        </table>
-        <div>
-          <button class="btn btn-primary" ng-click="handleTokenExpiration()">
+        <div class="button-container mb-3">
+          <button class="btn btn-danger btn-sm" ng-click="logout()">
+            Đăng xuất
+          </button>
+          <button
+            class="btn btn-success btn-sm"
+            ng-click="handleTokenExpiration()"
+          >
             Làm mới Token
           </button>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tên Sản Phẩm</th>
+                <th>Giá</th>
+                <th>Mô Tả</th>
+                <th>Voucher</th>
+                <th>Giảm Giá</th>
+                <th>Hạn Sử Dụng</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="product in products">
+                <td>{{ product.id }}</td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.price | currency }}</td>
+                <td>{{ product.description }}</td>
+                <td>{{ product.voucher.code }}</td>
+                <td>{{ product.voucher.discount }}%</td>
+                <td>{{ product.voucher.validUntil }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 

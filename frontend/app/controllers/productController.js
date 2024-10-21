@@ -28,7 +28,7 @@ angular.module("myApp").controller("productController", [
           });
       } else {
         sessionStorage.removeItem("accessToken");
-        $location.path("/login");
+        // $location.path("/login");
       }
     };
 
@@ -37,7 +37,7 @@ angular.module("myApp").controller("productController", [
       authService
         .refreshToken()
         .then(function (response) {
-          console.log("New access token", response.data.accessToken);
+          alert("You got access token!!!");
           sessionStorage.setItem("accessToken", response.data.accessToken);
           $scope.isTokenExpired = false;
           loadProducts(); // Tải lại danh sách sản phẩm

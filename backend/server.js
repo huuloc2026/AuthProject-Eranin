@@ -3,11 +3,12 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const authRoutes = require("./routes/authRoutes.js");
+const productRoutes = require("../backend/routes/productRoutes.js");
+const emailForgetRoutes = require("../backend/routes/emailForget.js");
 
 dotenv.config();
 
-const authRoutes = require("./routes/authRoutes.js");
-const productRoutes = require("../backend/routes/productRoutes.js");
 const PORT = process.env.PORT || 8888;
 const connection = require("./config/config.js");
 const app = express();
@@ -19,6 +20,7 @@ app.use(cookieParser());
 
 app.use("/auth", authRoutes);
 app.use("/products", productRoutes);
+app.use("/email", emailForgetRoutes);
 
 //test connection;
 (async () => {

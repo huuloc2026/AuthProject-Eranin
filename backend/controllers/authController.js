@@ -1,5 +1,6 @@
 const speakeasy = require("speakeasy");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 const QRCode = require("qrcode");
 const User = require("../models/userModel");
 
@@ -30,11 +31,12 @@ const returnQRCode = async (data, res) => {
   //   res.status(500).json({ message: "Error generating QR code" });
   // }
 };
-
+const randomCodePassWord = (min, max) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
 exports.generate2FACode = async (req, res, next) => {
   try {
     const token = req.headers.authorization.split(" ")[1];
-
     if (!token) {
       return res.status(400).json({ message: "Token not found" });
     }
@@ -55,8 +57,11 @@ exports.generate2FACode = async (req, res, next) => {
 };
 exports.verify2FACode = async (req, res, next) => {
   const { token } = req.body;
-  console.log("Token from backend", token);
-  // Lấy token từ Authorization header
+
+  if (!token) {
+    return res.status(400).json({ message: "2FA code is required" });
+  }
+
   const cookieToken = req.headers.authorization.split(" ")[1];
 
   if (!cookieToken) {
@@ -73,7 +78,6 @@ exports.verify2FACode = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    const { otpauthURL, base32 } = generateSpeakeasySecretCode();
 
     // Xác thực mã 2FA
     const isVerified = speakeasy.totp.verify({
@@ -81,6 +85,7 @@ exports.verify2FACode = async (req, res, next) => {
       encoding: "base32",
       token,
     });
+    console.log(isVerified);
     if (!isVerified) {
       return res
         .status(400)
@@ -100,8 +105,12 @@ exports.verify2FACode = async (req, res, next) => {
 
     return res.status(200).json({ message: "2FA verification successful" });
   } catch (error) {
-    console.error("Error verifying 2FA code:", error);
-    return res.status(401).json({ message: "Invalid token" });
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ message: "Invalid access token" });
+    }
+    return res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
@@ -125,9 +134,10 @@ exports.login = async (req, res, next) => {
 
     // Lưu refresh token vào cơ sở dữ liệu
     user.refreshToken = refreshToken;
+    user.randomCodePassWord = randomCodePassWord(1, 10000000);
+
     await user.save();
 
-    // Cài đặt cookie cho refresh token (nếu bạn muốn)
     // res.cookie("refreshToken", refreshToken, {
     //   httpOnly: true,
     //   secure: true,
@@ -142,7 +152,6 @@ exports.login = async (req, res, next) => {
       message: "Login successful",
       accessToken,
       refreshToken,
-
       user: {
         name: user.name,
         email: user.email,
@@ -222,7 +231,7 @@ exports.logout = async (req, res) => {
 };
 
 exports.requestRefreshToken = async (req, res, next) => {
-  console.log("Received refresh token request");
+  // console.log("Received refresh token request");
   // Kiểm tra xem header authorization có tồn tại không
   const authorizationHeader = req.headers.authorization;
 

@@ -1,0 +1,66 @@
+<div ng-controller="verifyControllerEmail">
+  <h2>Verify From Email 📩📩📩📩</h2>
+  <form ng-submit="verify()">
+    <div>
+      <label for="token">Enter Verification Token:</label>
+      <input type="text" id="token" ng-model="token" required />
+    </div>
+    <button type="submit" ng-disabled="loading">Verify</button>
+    <div ng-if="loading" class="loading">Verifying...</div>
+  </form>
+  <div ng-if="errorMessage" class="error-message">{{ errorMessage }}</div>
+</div>
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f0f0f0; /* Light background color */
+  }
+
+  div[ng-controller="verifyControllerEmail"] {
+    max-width: 400px; /* Max width for the form */
+    margin: 0 auto; /* Centering */
+    padding: 20px;
+    color: #0072d6;
+    background: #ffffff; /* White background for the form */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  }
+
+  form {
+    display: flex;
+    flex-direction: column; /* Vertical layout */
+  }
+
+  input[type="email"],
+  input[type="text"],
+  button {
+    padding: 10px;
+    margin: 10px 0; /* Spacing between elements */
+    border: 1px solid #ccc; /* Light border */
+    border-radius: 4px; /* Rounded corners */
+  }
+
+  button {
+    background-color: #28a745; /* Green button */
+    color: white; /* White text */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth color transition */
+  }
+
+  button:hover {
+    background-color: #218838; /* Darker green on hover */
+  }
+
+  .loading {
+    margin-top: 10px; /* Spacing above */
+    color: #007bff; /* Blue color for loading */
+  }
+
+  .error-message {
+    margin-top: 10px; /* Spacing above */
+    color: red; /* Red color for error messages */
+  }
+</style>

@@ -21,10 +21,10 @@ const userSchema = new mongoose.Schema({
     minLength: 8,
     select: false,
   },
-
   twoFactorAuthCode: String,
   twoFactorAuthEnabled: { type: Boolean, default: false },
-  refreshToken: { type: String }, // Thêm trường lưu refresh token
+  refreshToken: { type: String },
+  randomCodePassWord: { type: Number },
 });
 
 userSchema.methods.signShortJwtToken = function () {

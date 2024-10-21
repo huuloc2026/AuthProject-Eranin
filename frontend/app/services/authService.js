@@ -23,7 +23,6 @@ angular.module("myApp").service("authService", function ($http) {
       return Promise.reject("No token found");
     }
 
-    // Đặt headers cho yêu cầu
     const headers = {
       Authorization: `Bearer ${token}`,
     };
